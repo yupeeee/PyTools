@@ -12,7 +12,7 @@ for dataset_name in datasets.datasets:
 
         dataset = datasets.ImageNetDataset(
             root=f"{root}/{dataset_name}",
-            split='val',
+            split="val",
             transform=tf.Compose([
                 tf.Resize(256),
                 tf.CenterCrop(224),

@@ -1,5 +1,10 @@
+ml_collections
+more_itertools
 numpy
+pandas
 Pillow
 scipy
+timm
 torch
 torchvision
+tqdm

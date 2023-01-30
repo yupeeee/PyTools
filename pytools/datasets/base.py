@@ -55,6 +55,11 @@ class ClassificationDataset:
         self.data = dataset.data
         self.targets = dataset.targets
 
+        if isinstance(self.targets, list):
+            self.targets = torch.Tensor(self.targets)
+
+        self.targets = self.targets.to(torch.int64)
+
     def mean_and_std_of_data(
             self,
     ) -> Tuple[Any, Any]:
@@ -79,13 +84,24 @@ class ClassificationDataset:
     ) -> Tuple[Any, Any]:
         assert self.data is not None and self.targets is not None
 
-        indices = self.targets == c
+        indices = torch.arange(len(self))[self.targets == c]
 
-        data_c = self.data[indices]
+        if isinstance(self.data, list):
+            data_c = []
+
+            for i in indices:
+                data, _ = self[i]
+                data_c.append(data.unsqueeze(dim=0))
+
+            data_c = torch.cat(data_c, dim=0)
+
+        else:
+            data_c = self.data[indices]
+
+            if self.transform:
+                data_c = self.transform(data_c)
+
         targets_c = self.targets[indices]
-
-        if self.transform:
-            data_c = self.transform(data_c)
 
         if self.target_transform:
             targets_c = self.target_transform(targets_c)
