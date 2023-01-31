@@ -142,21 +142,61 @@ class ClassificationModel:
 
         return preds, confs
 
-    def x_ray(
+    def dissect(
             self,
-            data: Any,
+            dummy_data: Any,
     ) -> Dict[str, Any]:
         hooks = []
-        features = {}
+        layers = {}
 
         def register_hook(module):
             def hook(module, input, output):
                 class_name = str(module.__class__).split(".")[-1].split("'")[0]
-                module_idx = len(features)
+                module_idx = len(layers)
 
                 module_key = f"{class_name}-{module_idx + 1}"
 
-                features[module_key] = output.detach().cpu()
+                layers[module_key] = module
+
+            if (
+                    not isinstance(module, nn.Sequential)
+                    and not isinstance(module, nn.ModuleList)
+            ):
+                hooks.append(module.register_forward_hook(hook))
+
+        self.model.apply(register_hook)
+        self.model(dummy_data)
+
+        for hook in hooks:
+            hook.remove()
+
+        return layers
+
+    def x_ray(
+            self,
+            data: Any,
+    ) -> Tuple[Dict, Dict]:
+        hooks = []
+        inputs = {}
+        outputs = {}
+
+        def register_hook(module):
+            def hook(module, input, output):
+                class_name = str(module.__class__).split(".")[-1].split("'")[0]
+                module_idx = len(outputs)
+
+                module_key = f"{class_name}-{module_idx + 1}"
+
+                if isinstance(input, tuple):
+                    input = [v for v in input if v is not None]
+                    input = torch.cat(input, dim=0)
+
+                if isinstance(output, tuple):
+                    output = [v for v in output if v is not None]
+                    output = torch.cat(output, dim=0)
+
+                inputs[module_key] = input.detach().cpu()
+                outputs[module_key] = output.detach().cpu()
 
             if (
                     not isinstance(module, nn.Sequential)
@@ -170,4 +210,4 @@ class ClassificationModel:
         for hook in hooks:
             hook.remove()
 
-        return features
+        return inputs, outputs

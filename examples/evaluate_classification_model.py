@@ -34,11 +34,11 @@ classes.sort()
 
 acc = 0
 
-for i in tqdm.trange(
-        len(classes),
+for c in tqdm.tqdm(
+        classes,
         desc=f"Evaluating {imagenet_model_names[model_name]} on {dataset.name}...",
 ):
-    data, targets = dataset.data_and_targets_of_class_c(c=classes[i])
+    data, targets = dataset.data_and_targets_of_class_c(c)
     preds, _ = model.predict(getattr(data, machine)())
 
     acc += sum(preds == targets)
