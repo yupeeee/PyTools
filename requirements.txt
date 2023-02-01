@@ -1,8 +1,12 @@
+grad-cam
+matplotlib
 ml_collections
 more_itertools
 numpy
+opencv_python
 pandas
 Pillow
+scikit_learn
 scipy
 timm
 torch

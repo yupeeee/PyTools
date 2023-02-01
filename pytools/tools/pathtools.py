@@ -23,7 +23,7 @@ def get_file_list(
     from .listools import sort_str_list
 
     file_list = os.listdir(path)
-    file_list = sort_str_list(file_list)
+    file_list, _ = sort_str_list(file_list)
 
     if fext is None:
         return file_list

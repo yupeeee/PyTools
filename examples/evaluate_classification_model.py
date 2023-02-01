@@ -5,13 +5,14 @@ from pytools.models import \
     ImageNetClassificationModel, Preprocess, default_weight_specification, weights_dir, imagenet_model_names
 
 
+ImageNet_dir = "D:/dataset/ImageNet"
 model_name = "resnet50"
 weight_specification = default_weight_specification
 use_cuda = True
 machine = "cuda" if use_cuda else "cpu"
 
 dataset = ImageNetDataset(
-    root="D:/dataset/ImageNet",
+    root=ImageNet_dir,
     split="val",
     transform=Preprocess(
         model_name=model_name,

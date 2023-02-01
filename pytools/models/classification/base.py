@@ -1,9 +1,12 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Iterable, Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import models
+
+from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 
 from .config import *
 
@@ -96,6 +99,7 @@ class ClassificationModel:
         self.specify_weights = specify_weights
         self.weights_dir = weights_dir
         self.mode = mode
+        self.use_cuda = use_cuda
         self.machine = "cuda" if use_cuda else "cpu"
 
         self.model = self.load_model()
@@ -151,12 +155,13 @@ class ClassificationModel:
 
         def register_hook(module):
             def hook(module, input, output):
-                class_name = str(module.__class__).split(".")[-1].split("'")[0]
-                module_idx = len(layers)
+                if len(input) and len(output):
+                    class_name = str(module.__class__).split(".")[-1].split("'")[0]
+                    module_idx = len(layers)
 
-                module_key = f"{class_name}-{module_idx + 1}"
+                    module_key = f"{class_name}-{module_idx + 1}"
 
-                layers[module_key] = module
+                    layers[module_key] = module
 
             if (
                     not isinstance(module, nn.Sequential)
@@ -182,21 +187,22 @@ class ClassificationModel:
 
         def register_hook(module):
             def hook(module, input, output):
-                class_name = str(module.__class__).split(".")[-1].split("'")[0]
-                module_idx = len(outputs)
+                if len(input) and len(output):
+                    class_name = str(module.__class__).split(".")[-1].split("'")[0]
+                    module_idx = len(outputs)
 
-                module_key = f"{class_name}-{module_idx + 1}"
+                    module_key = f"{class_name}-{module_idx + 1}"
 
-                if isinstance(input, tuple):
-                    input = [v for v in input if v is not None]
-                    input = torch.cat(input, dim=0)
+                    if isinstance(input, tuple):
+                        input = [v for v in input if v is not None]
+                        input = torch.cat(input, dim=0)
 
-                if isinstance(output, tuple):
-                    output = [v for v in output if v is not None]
-                    output = torch.cat(output, dim=0)
+                    if isinstance(output, tuple):
+                        output = [v for v in output if v is not None]
+                        output = torch.cat(output, dim=0)
 
-                inputs[module_key] = input.detach().cpu()
-                outputs[module_key] = output.detach().cpu()
+                    inputs[module_key] = input.detach().cpu()
+                    outputs[module_key] = output.detach().cpu()
 
             if (
                     not isinstance(module, nn.Sequential)
@@ -211,3 +217,38 @@ class ClassificationModel:
             hook.remove()
 
         return inputs, outputs
+
+    def grad_cam(
+            self,
+            data: Any,
+            targets: Iterable[Any],
+            indices: Iterable[int],
+            colormap: str = None,
+            aug_smooth: bool = False,
+            eigen_smooth: bool = False,
+    ) -> torch.Tensor:
+        layers = self.dissect(dummy_data=data)
+        layer_names = list(layers.keys())
+
+        target_layer_names = [layer_names[i] for i in indices]
+        target_layers = [layers[layer_name] for layer_name in target_layer_names]
+
+        cam = GradCAM(model=self.model, target_layers=target_layers, use_cuda=self.use_cuda)
+
+        if targets is not None:
+            targets = [ClassifierOutputTarget(target) for target in targets]
+
+        mask = cam(
+            input_tensor=data,
+            targets=targets,
+            aug_smooth=aug_smooth,
+            eigen_smooth=eigen_smooth,
+        )
+
+        if colormap is not None:
+            from ...tools.imgtools import grayscale_to_colormap
+
+            mask = grayscale_to_colormap(np.uint8(mask * 255), colormap)
+            mask = np.float32(mask) / 255
+
+        return torch.from_numpy(mask)

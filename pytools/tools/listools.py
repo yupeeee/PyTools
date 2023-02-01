@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Tuple
 
 from itertools import chain, compress
 from more_itertools import locate
@@ -90,8 +90,7 @@ def save_list_in_txt(
 
 def sort_str_list(
         str_list: List[str],
-        return_indices: bool = False,
-) -> Any:
+) -> Tuple[List[str], List[int]]:
     convert = lambda text: int(text) if text.isdigit() else text
 
     sorted_str_list = sorted(
@@ -104,11 +103,7 @@ def sort_str_list(
         key=lambda key: [convert(c) for c in re.split('([0-9]+)', str_list[key])],
     )
 
-    if return_indices:
-        return sorted_str_list, indices
-
-    else:
-        return sorted_str_list
+    return sorted_str_list, indices
 
 
 def remove_empty_string_from_str_list(
