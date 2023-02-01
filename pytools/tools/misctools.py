@@ -1,8 +1,11 @@
 from typing import Tuple
 
+import matplotlib.pyplot as plt
+
 
 __all__ = [
     "best_figsize_for_subplots",
+    "plot_multiple_images",
 ]
 
 
@@ -54,3 +57,22 @@ def best_figsize_for_subplots(
             break
 
     return best
+
+
+def plot_multiple_images(
+        images,
+        desired_hw_ratio: Tuple[int, int] = (1, 1),
+) -> None:
+    num_figs = len(images)
+    h, w = best_figsize_for_subplots(num_figs, desired_hw_ratio)
+
+    fig, axes = plt.subplots(nrows=h, ncols=w)
+    axes = axes.ravel()
+
+    for i in range(num_figs):
+        axes[i].imshow(images[i])
+
+    [ax.set_axis_off() for ax in axes]
+
+    plt.tight_layout()
+    plt.show()
