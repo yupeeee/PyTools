@@ -4,6 +4,8 @@ from pytools.models import ImageNetClassificationModel, default_weight_specifica
 
 
 model_name = "resnet50"
+target = "ReLU"
+to = "GELU"
 use_cuda = False
 machine = "cuda" if use_cuda else "cpu"
 
@@ -18,8 +20,8 @@ model = ImageNetClassificationModel(
 )
 
 Replacer(
-    target="ReLU",
-    to="GELU",
+    target=target,
+    to=to,
 )(model.model)
 
 print(model.model)

@@ -1,8 +1,7 @@
-"""
-Error occurs when replaced: TBD
-"""
+from collections import OrderedDict
 import math
 import torch.nn as nn
+from torchvision.ops import Permute
 
 
 __all__ = [
@@ -24,11 +23,15 @@ def BatchNorm2d_to_LayerNorm(
 
     elementwise_affine = bool(affine.split("=")[-1])
 
-    return nn.LayerNorm(
-        normalized_shape=normalized_shape,
-        eps=eps,
-        elementwise_affine=elementwise_affine,
-    )
+    return nn.Sequential(OrderedDict([
+        ("pre-permute", Permute(dims=[0, 2, 3, 1])),
+        ("norm", nn.LayerNorm(
+            normalized_shape=normalized_shape,
+            eps=eps,
+            elementwise_affine=elementwise_affine,
+        )),
+        ("post-permute", Permute(dims=[0, 3, 1, 2])),
+    ]))
 
 
 def LayerNorm_to_BatchNorm2d(
@@ -45,8 +48,12 @@ def LayerNorm_to_BatchNorm2d(
 
     affine = bool(elementwise_affine.split("=")[-1])
 
-    return nn.BatchNorm2d(
-        num_features=num_features,
-        eps=eps,
-        affine=affine,
-    )
+    return nn.Sequential(OrderedDict([
+        ("pre-permute", Permute(dims=[0, 3, 1, 2])),
+        ("norm", nn.BatchNorm2d(
+            num_features=num_features,
+            eps=eps,
+            affine=affine,
+        )),
+        ("post-permute", Permute(dims=[0, 2, 3, 1])),
+    ]))
