@@ -123,6 +123,8 @@ class ClassificationModel:
             if self.pretrained:
                 weights = load_pytorch_model_weights(self.name, self.specify_weights)
                 model = model(weights=weights)
+            else:
+                model = model(weights=None)
 
         else:
             model = load_not_in_pytorch_model(self.name, self.pretrained, self.weights_dir)
