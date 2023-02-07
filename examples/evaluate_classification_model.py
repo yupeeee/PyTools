@@ -11,6 +11,7 @@ weight_specification = default_weight_specification
 use_cuda = True
 machine = "cuda" if use_cuda else "cpu"
 
+
 dataset = ImageNetDataset(
     root=ImageNet_dir,
     split="val",
