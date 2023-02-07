@@ -130,6 +130,7 @@ dmypy.json
 
 
 .idea/
-weights/
+structure/
 temp/
 travel_data/
+weights/
