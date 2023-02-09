@@ -11,9 +11,12 @@ class Replacer:
             self,
             target: str,
             to: str,
+            use_cuda: bool = False,
     ) -> None:
         self.target = target
         self.to = to
+        self.use_cuda = use_cuda
+        self.machine = "cuda" if use_cuda else "cpu"
 
     def __call__(
             self,
@@ -43,6 +46,6 @@ class Replacer:
             class_name = str(child.__class__).split(".")[-1].split("'")[0]
 
             if self.target == class_name:
-                setattr(model, child_name, replacer(child))
+                setattr(model, child_name, replacer(child, self.use_cuda))
             else:
                 self.replace_layer(child, replacer)

@@ -136,6 +136,12 @@ class ClassificationModel:
 
         return model
 
+    def load_state_dict(
+            self,
+            state_dict_path: str,
+    ) -> None:
+        self.model.load_state_dict(torch.load(state_dict_path))
+
     def predict(
             self,
             data: Any,

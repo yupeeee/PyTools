@@ -133,4 +133,5 @@ dmypy.json
 structure/
 temp/
 travel_data/
+logs/
 weights/

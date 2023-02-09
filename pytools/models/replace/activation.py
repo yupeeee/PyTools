@@ -9,6 +9,7 @@ __all__ = [
 
 def GELU_to_ReLU(
         module: nn.Module,
+        use_cuda: bool = False,
 ) -> nn.Module:
     return nn.ReLU(
         inplace=True,
@@ -17,6 +18,7 @@ def GELU_to_ReLU(
 
 def ReLU_to_GELU(
         module: nn.Module,
+        use_cuda: bool = False,
 ) -> nn.Module:
     return nn.GELU(
         approximate='none',

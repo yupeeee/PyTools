@@ -12,6 +12,9 @@ __all__ = [
     "copy_dictionary",
     "merge_list_of_dictionaries",
     "load_and_merge_csv_dicts_in_dir",
+
+    "AttrDict",
+    "make_attrdict",
 ]
 
 
@@ -124,3 +127,32 @@ def load_and_merge_csv_dicts_in_dir(
     merged_dict = merge_list_of_dictionaries(list_of_dictionaries, verbose)
 
     return merged_dict
+
+
+class AttrDict(dict):
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        else:
+            raise AttributeError(f"No such attribute: {name}")
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
+    def __delattr__(self, name):
+        if name in self:
+            del self[name]
+        else:
+            raise AttributeError(f"No such attribute: {name}")
+
+
+def make_attrdict(
+        dictionary: Dict,
+) -> AttrDict:
+    dictionary = AttrDict(dictionary)
+
+    for key, value in dictionary.items():
+        if isinstance(value, dict):
+            dictionary[key] = make_attrdict(value)
+
+    return dictionary

@@ -6,6 +6,7 @@ numpy
 opencv_python
 pandas
 Pillow
+pyyaml
 scikit_learn
 scipy
 timm

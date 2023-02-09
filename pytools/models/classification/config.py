@@ -11,6 +11,34 @@ default_weight_specification = 'IMAGENET1K_V1'
 
 weights_dir = './pytools/models/classification/weights'
 
+default_cifar10_train_preprocess = tf.Compose([
+    tf.ToPILImage(),
+    tf.RandomCrop(32, padding=4),
+    tf.RandomHorizontalFlip(),
+    tf.RandomRotation(15),
+    tf.ToTensor(),
+    normalize['CIFAR-10'],
+])
+
+default_cifar10_val_preprocess = tf.Compose([
+    tf.ToTensor(),
+    normalize['CIFAR-10'],
+])
+
+default_cifar100_train_preprocess = tf.Compose([
+    tf.ToPILImage(),
+    tf.RandomCrop(32, padding=4),
+    tf.RandomHorizontalFlip(),
+    tf.RandomRotation(15),
+    tf.ToTensor(),
+    normalize['CIFAR-100'],
+])
+
+default_cifar100_val_preprocess = tf.Compose([
+    tf.ToTensor(),
+    normalize['CIFAR-100'],
+])
+
 default_imagenet_preprocess = tf.Compose([
     tf.CenterCrop(256),
     tf.Resize(224),

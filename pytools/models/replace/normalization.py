@@ -12,6 +12,7 @@ __all__ = [
 
 def BatchNorm2d_to_LayerNorm(
         module: nn.Module,
+        use_cuda: bool = False,
 ) -> nn.Module:
     from .common import get_params, exponential_string_to_float
 
@@ -29,13 +30,15 @@ def BatchNorm2d_to_LayerNorm(
             normalized_shape=normalized_shape,
             eps=eps,
             elementwise_affine=elementwise_affine,
+            device="cuda" if use_cuda else "cpu",
         )),
         ("post-permute", Permute(dims=[0, 3, 1, 2])),
     ]))
 
 
 def LayerNorm_to_BatchNorm2d(
-        module: nn.Module
+        module: nn.Module,
+        use_cuda: bool = False,
 ) -> nn.Module:
     from .common import get_params, exponential_string_to_float
 
@@ -54,6 +57,7 @@ def LayerNorm_to_BatchNorm2d(
             num_features=num_features,
             eps=eps,
             affine=affine,
+            device="cuda" if use_cuda else "cpu",
         )),
         ("post-permute", Permute(dims=[0, 2, 3, 1])),
     ]))

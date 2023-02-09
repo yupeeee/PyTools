@@ -6,6 +6,7 @@ import torch.nn as nn
 __all__ = [
     "get_params",
     "exponential_string_to_float",
+    "reshape_classifier_output",
 ]
 
 
@@ -39,3 +40,48 @@ def exponential_string_to_float(
     num, exponent = exponential.split("e")
 
     return float(f"{num}E{exponent}")
+
+
+def replace_layer(
+        self,
+        model,
+        replacer,
+        use_cuda: bool = False,
+) -> None:
+    for child_name, child in model.named_children():
+        class_name = str(child.__class__).split(".")[-1].split("'")[0]
+
+        if self.target == class_name:
+            setattr(model, child_name, replacer(child, use_cuda))
+        else:
+            self.replace_layer(child, replacer)
+
+
+def reshape_classifier_output(
+        model,
+        out_features: int,
+        use_cuda: bool = False,
+) -> None:
+    child_name, child = list(model.named_children())[-1]
+
+    class_name = str(child.__class__).split(".")[-1].split("'")[0]
+
+    if class_name == "Linear":
+        params = get_params(child)
+
+        in_features = int(params[0].split("=")[-1])
+        bias = bool(params[2].split("=")[-1])
+
+        setattr(
+            model,
+            child_name,
+            nn.Linear(
+                in_features=in_features,
+                out_features=out_features,
+                bias=bias,
+                device="cuda" if use_cuda else "cpu",
+            )
+        )
+
+    else:
+        reshape_classifier_output(child, out_features)
