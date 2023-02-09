@@ -8,6 +8,7 @@ from pytools.tools import plot_multiple_images
 ImageNet_dir = "D:/dataset/ImageNet"
 model_name = "resnet50"
 layer_kind = "Conv2d"
+layer_ith = None
 alpha = 0.5
 class_index = 208
 weight_specification = default_weight_specification
@@ -46,7 +47,7 @@ indices = np.arange(len(layer_names)) if layer_kind == "all" else \
 cam = model.grad_cam(
     data=getattr(data, machine)(),
     targets=targets,
-    indices=indices,
+    indices=indices if layer_ith is None else [indices[layer_ith]],
     colormap="jet",
     aug_smooth=False,
     eigen_smooth=False,
