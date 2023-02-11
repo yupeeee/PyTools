@@ -1,3 +1,6 @@
+"""
+python train.py -dataset imagenet -model swin_t -config ./train_config.yaml -seed 0 -cuda
+"""
 from argparse import ArgumentParser
 
 from pytools.datasets import *
@@ -61,7 +64,7 @@ def run():
     elif dataset_name == "imagenet":
         train_dataset = ImageNetDataset(
             root=f"{dataset_root}/ImageNet",
-            split="val",
+            split="train",
             transform=default_imagenet_preprocess,
             target_transform=None,
         )

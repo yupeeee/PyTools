@@ -148,7 +148,7 @@ class Trainer:
             index_col="epoch",
         )
 
-        with open(f"{log_save_dir}/config.yaml", "w") as f:
+        with open(f"{log_save_dir}/config.yaml", "w") as _:
             _ = yaml.dump(self.config)
 
     def train(self, model, dataloader, epoch):
