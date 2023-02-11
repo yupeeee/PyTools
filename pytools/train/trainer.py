@@ -120,6 +120,8 @@ class Trainer:
 
             # save best model weights
             if eval_acc > best_eval_acc:
+                best_eval_acc = eval_acc
+
                 print(f"Saving best weights to {weights_save_dir}... (Epoch: {epoch})\n")
                 torch.save(
                     self.model.model.state_dict(),

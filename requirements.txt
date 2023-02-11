@@ -3,7 +3,7 @@ matplotlib
 ml_collections
 more_itertools
 numpy
-opencv_python
+opencv-python == 4.5.5.64
 pandas
 Pillow
 pyyaml
