@@ -15,7 +15,7 @@ OPTIMIZER:
 
 SCHEDULER:
   TYPE: CosineAnnealingLR
-  T_MAX: 280
+  T_MAX: 300
   ETA_MIN: 0.000005
 
   WARMUP:
