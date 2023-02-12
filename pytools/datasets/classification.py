@@ -116,7 +116,7 @@ class ImageNetDataset(ClassificationDataset):
     ) -> List[Tuple[str, int]]:
         from torchvision.datasets import DatasetFolder
 
-        extensions = [".JPEG",]
+        extensions = [".jpeg",]
 
         datasetfolder = DatasetFolder(
             root=f"{root}/{split}",
