@@ -73,6 +73,12 @@ class Trainer:
 
         best_eval_acc = 0.0
 
+        log_save_dir = \
+            f"{log_save_root}/" \
+            f"{self.train_dataloader.dataset.name}/" \
+            f"{self.model.name}-{self.datetime}"
+        makedir(log_save_dir)
+
         log = {
             "epoch": [],
             "lr": [],
@@ -143,22 +149,16 @@ class Trainer:
                     f"{weights_save_dir}/{self.model.name}-epoch_{epoch}.pth"
                 )
 
-        # save train log
-        log_save_dir = \
-            f"{log_save_root}/" \
-            f"{self.train_dataloader.dataset.name}/" \
-            f"{self.model.name}-{self.datetime}"
-        makedir(log_save_dir)
+            # save train log
+            save_dictionary_in_csv(
+                dictionary=log,
+                save_dir=log_save_dir,
+                save_name="log",
+                index_col="epoch",
+            )
 
-        save_dictionary_in_csv(
-            dictionary=log,
-            save_dir=log_save_dir,
-            save_name="log",
-            index_col="epoch",
-        )
-
-        with open(f"{log_save_dir}/config.yaml", "w") as f:
-            yaml.dump(self.config, f, default_flow_style=False)
+            with open(f"{log_save_dir}/config.yaml", "w") as f:
+                yaml.dump(self.config, f, default_flow_style=False)
 
     def train(self, model, dataloader, epoch):
         start = time.time()
