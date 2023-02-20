@@ -79,6 +79,9 @@ class Trainer:
             f"{self.model.name}-{self.datetime}"
         makedir(log_save_dir)
 
+        with open(f"{log_save_dir}/config.yaml", "w") as f:
+            yaml.dump(self.config, f, default_flow_style=False)
+
         log = {
             "epoch": [],
             "lr": [],
@@ -156,9 +159,6 @@ class Trainer:
                 save_name="log",
                 index_col="epoch",
             )
-
-            with open(f"{log_save_dir}/config.yaml", "w") as f:
-                yaml.dump(self.config, f, default_flow_style=False)
 
     def train(self, model, dataloader, epoch):
         start = time.time()
