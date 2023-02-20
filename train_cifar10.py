@@ -11,6 +11,7 @@ from pytools.train import SupervisedLearner
 
 
 dataset_root = "D:/dataset/CIFAR-10"
+# dataset_root = "/home/juyeopkim/dataset/CIFAR-10"
 weights_save_root = "./weights"
 log_save_root = "./logs"
 weights_save_period = 10

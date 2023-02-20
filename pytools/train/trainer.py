@@ -1,6 +1,8 @@
 from datetime import datetime
+import numpy as np
 import time
 import torch
+from torch.nn import DataParallel
 import tqdm
 import yaml
 
@@ -38,6 +40,11 @@ class Trainer:
         from .optimizer import build_optimizer
 
         self.model = model
+
+        self.model.model = DataParallel(
+            module=self.model.model,
+            device_ids=list(np.arange(torch.cuda.device_count())),
+        )
 
         self.config = load_config(config_path)
 
