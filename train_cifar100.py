@@ -51,17 +51,27 @@ def run():
                 use_cuda=use_cuda,
             )(model.model)
 
-    SupervisedLearner(
+    trainer = SupervisedLearner(
         train_dataset=train_dataset,
         val_dataset=val_dataset,
         model=model,
         config_path=config_path,
         use_cuda=use_cuda,
-    ).run(
-        weights_save_root=weights_save_root,
-        log_save_root=log_save_root,
-        weights_save_period=weights_save_period,
     )
+
+    if resume:
+        trainer.resume(
+            weights_save_root=weights_save_root,
+            log_save_root=log_save_root,
+            prev_datetime=prev_datetime,
+            weights_save_period=weights_save_period,
+        )
+    else:
+        trainer.run(
+            weights_save_root=weights_save_root,
+            log_save_root=log_save_root,
+            weights_save_period=weights_save_period,
+        )
 
 
 if __name__ == "__main__":
@@ -73,6 +83,8 @@ if __name__ == "__main__":
     parser.add_argument("-cuda", action="store_true", default=False)
 
     parser.add_argument("-replace", type=str, default=None)
+
+    parser.add_argument("-resume", type=str, default=None)
 
     args = parser.parse_args()
 
@@ -86,5 +98,11 @@ if __name__ == "__main__":
 
     if replacements is not None:
         replacements = replacements.split(",")
+
+    prev_datetime = args.resume
+    resume = False
+
+    if prev_datetime is not None:
+        resume = True
 
     run()

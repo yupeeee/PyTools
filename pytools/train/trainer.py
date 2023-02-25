@@ -6,7 +6,7 @@ from torch.nn import DataParallel
 import tqdm
 import yaml
 
-from ..tools import AttrDict
+from ..tools import AttrDict, load_csv_dict
 
 
 __all__ = [
@@ -61,13 +61,14 @@ class Trainer:
 
         self.use_cuda = use_cuda
 
-        self.datetime = datetime.now().strftime("%Y-%m-%d %a %H-%M-%S")
+        self.datetime = datetime.now().strftime("%y%m%d%H%M%S")
 
     def run(
             self,
             weights_save_root: str,
             log_save_root: str,
             weights_save_period: int = 1,
+            start_epoch: int = 1,
     ) -> None:
         from ..tools import makedir, save_dictionary_in_csv
 
@@ -77,49 +78,58 @@ class Trainer:
             f"{log_save_root}/" \
             f"{self.train_dataloader.dataset.name}/" \
             f"{self.model.name}-{self.datetime}"
-        makedir(log_save_dir)
 
-        with open(f"{log_save_dir}/config.yaml", "w") as f:
-            yaml.dump(self.config, f, default_flow_style=False)
-
-        log = {
-            "epoch": [],
-            "lr": [],
-
-            "train_time": [],
-            "train_loss": [],
-            "train_acc": [],
-        }
-
-        if self.val_dataloader is not None:
-            log["eval_time"] = []
-            log["eval_loss"] = []
-            log["eval_acc"] = []
-
-        # save initial model
         weights_save_dir = \
             f"{weights_save_root}/" \
             f"{self.train_dataloader.dataset.name}/" \
             f"{self.model.name}_{self.datetime}"
-        makedir(weights_save_dir)
+        
+        if start_epoch == 1:
+            makedir(log_save_dir)
+            makedir(weights_save_dir)
+            
+            # save train configuration
+            with open(f"{log_save_dir}/config.yaml", "w") as f:
+                yaml.dump(self.config, f, default_flow_style=False)
 
-        print(f"Saving initial weights to {weights_save_dir}...\n")
-        torch.save(
-            self.model.model.state_dict(),
-            f"{weights_save_dir}/{self.model.name}-init.pth"
-        )
+            # save initial model
+            print(f"Saving initial weights to {weights_save_dir}...\n")
+            torch.save(
+                self.model.model.state_dict(),
+                f"{weights_save_dir}/{self.model.name}-init.pth"
+            )
 
-        for epoch in range(1, self.epochs + 1):
+            log = {
+                "epoch": [],
+                "lr": [],
+
+                "train_time": [],
+                "train_loss": [],
+                "train_acc": [],
+            }
+
+            if self.val_dataloader is not None:
+                log["eval_time"] = []
+                log["eval_loss"] = []
+                log["eval_acc"] = []
+
+        else:
+            log = load_csv_dict(
+                csv_path=f"{log_save_dir}/log.csv",
+                index_col=None,
+            )
+
+        for epoch in range(start_epoch, self.epochs + 1):
             # train
             lr, train_time, train_loss, train_acc = \
                 self.train(self.model.model, self.train_dataloader, epoch)
 
-            log['epoch'].append(epoch)
-            log['lr'].append(lr)
+            log["epoch"].append(epoch)
+            log["lr"].append(lr)
 
-            log['train_time'].append(train_time)
-            log['train_loss'].append(train_loss)
-            log['train_acc'].append(train_acc)
+            log["train_time"].append(train_time)
+            log["train_loss"].append(train_loss)
+            log["train_acc"].append(train_acc)
 
             self.scheduler.step()
 
@@ -128,9 +138,10 @@ class Trainer:
                 eval_time, eval_loss, eval_acc = \
                     self.eval(self.model.model, self.val_dataloader, epoch)
 
-                log['eval_time'].append(eval_time)
-                log['eval_loss'].append(eval_loss)
-                log['eval_acc'].append(eval_acc)
+                log["eval_time"].append(eval_time)
+                log["eval_loss"].append(eval_loss)
+                log["eval_acc"].append(eval_acc)
+
             else:
                 eval_acc = train_acc
 
@@ -158,6 +169,16 @@ class Trainer:
                 save_dir=log_save_dir,
                 save_name="log",
                 index_col="epoch",
+            )
+
+            # save checkpoint
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "state_dict": self.model.model.state_dict(),
+                    "optimizer": self.optimizer.state_dict(),
+                },
+                f"{log_save_dir}/checkpoint.pt",
             )
 
     def train(self, model, dataloader, epoch):
@@ -235,6 +256,33 @@ class Trainer:
         print(f"EVAL LOSS: {eval_loss:.8f}\tEVAL ACC: {(eval_acc * 100):.4f}%\n")
 
         return finish - start, eval_loss, eval_acc
+
+    def resume(
+            self,
+            weights_save_root: str,
+            log_save_root: str,
+            prev_datetime: str,
+            weights_save_period: int = 1,
+    ) -> None:
+        self.datetime = prev_datetime
+
+        log_save_dir = \
+            f"{log_save_root}/" \
+            f"{self.train_dataloader.dataset.name}/" \
+            f"{self.model.name}-{self.datetime}"
+
+        checkpoint = torch.load(f"{log_save_dir}/checkpoint.pt")
+
+        stopped_epoch = checkpoint["epoch"]
+        self.model.model.load_state_dict(checkpoint["state_dict"])
+        self.optimizer.load_state_dict(checkpoint["optimizer"])
+
+        self.run(
+            weights_save_root,
+            log_save_root,
+            weights_save_period,
+            start_epoch=stopped_epoch + 1,
+        )
 
 
 class SupervisedLearner(Trainer):
