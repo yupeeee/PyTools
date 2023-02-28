@@ -25,7 +25,7 @@ schedulers = [
 ]
 
 
-def build_scheduler(optimizer, config):
+def build_scheduler(optimizer, config, start_epoch):
     scheduler_type = config.SCHEDULER.TYPE
 
     assert scheduler_type in schedulers
@@ -45,7 +45,7 @@ def build_scheduler(optimizer, config):
     if hasattr(config.SCHEDULER, "WARMUP"):
         from .lr_warmup import warmup_wrapper
 
-        scheduler = warmup_wrapper(scheduler, config)
+        scheduler = warmup_wrapper(scheduler, config, start_epoch)
 
     return scheduler
 

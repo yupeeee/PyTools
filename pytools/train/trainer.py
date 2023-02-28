@@ -48,6 +48,7 @@ class Trainer:
 
         self.config = load_config(config_path)
 
+        self.start_epoch = 1
         self.epochs = self.config.EPOCH
 
         self.train_dataloader = build_dataloader(train_dataset, self.config)
@@ -57,7 +58,7 @@ class Trainer:
 
         self.optimizer = build_optimizer(model.model, self.config)
 
-        self.scheduler = build_scheduler(self.optimizer, self.config)
+        self.scheduler = build_scheduler(self.optimizer, self.config, self.start_epoch)
 
         self.use_cuda = use_cuda
 
@@ -68,7 +69,6 @@ class Trainer:
             weights_save_root: str,
             log_save_root: str,
             weights_save_period: int = 1,
-            start_epoch: int = 1,
     ) -> None:
         from ..tools import makedir, save_dictionary_in_csv
 
@@ -84,7 +84,7 @@ class Trainer:
             f"{self.train_dataloader.dataset.name}/" \
             f"{self.model.name}_{self.datetime}"
         
-        if start_epoch == 1:
+        if self.start_epoch == 1:
             makedir(log_save_dir)
             makedir(weights_save_dir)
             
@@ -119,7 +119,7 @@ class Trainer:
                 index_col=None,
             )
 
-        for epoch in range(start_epoch, self.epochs + 1):
+        for epoch in range(self.start_epoch, self.epochs + 1):
             # train
             lr, train_time, train_loss, train_acc = \
                 self.train(self.model.model, self.train_dataloader, epoch)
@@ -264,6 +264,12 @@ class Trainer:
             prev_datetime: str,
             weights_save_period: int = 1,
     ) -> None:
+        from .lr_scheduler import build_scheduler
+
+        print(
+            f"Resuming {prev_datetime}... "
+            f"(dataset: {self.train_dataloader.dataset.name} / model: {self.model.name})"
+        )
         self.datetime = prev_datetime
 
         log_save_dir = \
@@ -277,11 +283,14 @@ class Trainer:
         self.model.model.load_state_dict(checkpoint["state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer"])
 
+        self.start_epoch = stopped_epoch + 1
+
+        self.scheduler = build_scheduler(self.optimizer, self.config, self.start_epoch)
+
         self.run(
             weights_save_root,
             log_save_root,
             weights_save_period,
-            start_epoch=stopped_epoch + 1,
         )
 
 

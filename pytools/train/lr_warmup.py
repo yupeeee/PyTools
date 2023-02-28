@@ -13,7 +13,7 @@ strategies = [
 ]
 
 
-def warmup_wrapper(scheduler, config):
+def warmup_wrapper(scheduler, config, start_epoch):
     """
     in config.yaml:
     ⋮
@@ -31,6 +31,7 @@ def warmup_wrapper(scheduler, config):
         init_lr=config.SCHEDULER.WARMUP.INIT_LR,
         warmup_steps=config.SCHEDULER.WARMUP.WARMUP_STEPS,
         strategy=config.SCHEDULER.WARMUP.STRATEGY,
+        start_epoch=start_epoch,
     )
 
 
@@ -55,6 +56,7 @@ class WarmUpLR(_LRScheduler):
             init_lr: float = 0.,
             warmup_steps: int = 1,
             strategy: str = "linear",
+            start_epoch: int = 1,
     ) -> None:
         assert strategy in strategies
 
@@ -62,6 +64,8 @@ class WarmUpLR(_LRScheduler):
         self.init_lr = init_lr
         self.warmup_steps = warmup_steps
         self.strategy = strategy
+
+        self.start_epoch = start_epoch
 
         if strategy == "const":
             self.warmup_ft = warmup_const
@@ -101,6 +105,10 @@ class WarmUpLR(_LRScheduler):
 
             group["lr"] = init_lr
             group["warmup_init_lr"] = init_lr
+
+        for i in range(self.start_epoch - 1):
+            self.scheduler.optimizer.step()
+            self.step()
 
     def get_lr(self):
         lrs = []
