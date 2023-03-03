@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name="PyTools",
+    name="yupeeee-pytools",
     version="0.0.1",
     description="",
     long_description=open("README.md").read(),
