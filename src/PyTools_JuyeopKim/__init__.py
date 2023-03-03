@@ -1,9 +1,9 @@
 # A sexy way to import stuff
-import datasets as datasets
-import models as models
-import tools as tools
-import train as train
-import travel as travel
+from . import datasets
+from . import models
+from . import tools
+from . import train
+from . import travel
 
 
 __all__ = [
