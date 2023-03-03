@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "PyTools_JuyeopKim"
+name = "yupeeee_pytools"
 version = "0.0.1"
 authors = [
     { name="Juyeop Kim", email="juyeopkim@yonsei.ac.kr" },

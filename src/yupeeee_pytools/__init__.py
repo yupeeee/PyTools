@@ -1,4 +1,3 @@
-# A sexy way to import stuff
 from . import datasets
 from . import models
 from . import tools
