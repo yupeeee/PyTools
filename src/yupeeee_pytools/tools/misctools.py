@@ -1,11 +1,14 @@
 from typing import Tuple
 
 import matplotlib.pyplot as plt
+import torch
 
 
 __all__ = [
     "best_figsize_for_subplots",
     "plot_multiple_images",
+
+    "repeat_tensor",
 ]
 
 
@@ -90,3 +93,11 @@ def plot_multiple_images(
         plt.close("all")
     else:
         plt.show()
+
+
+def repeat_tensor(
+        tensor: torch.Tensor,
+        repeat: int,
+        dim: int = 0,
+) -> torch.Tensor:
+    return torch.repeat_interleave(tensor[None, ...], repeat, dim=dim)
