@@ -4,10 +4,13 @@ from argparse import ArgumentParser
 import torch
 import tqdm
 
-from pytools.datasets import ImageNetDataset, normalize, denormalize
-from pytools.models import ImageNetClassificationModel, Preprocess, default_weight_specification, weights_dir
-from pytools.tools import makedir, angle_of_three_points, save_dictionary_in_csv
-from pytools.travel import fgsm_direction
+from yupeeee_pytools.datasets import ImageNetDataset, normalize, denormalize
+from yupeeee_pytools.models import ImageNetClassificationModel, Preprocess, default_weight_specification
+from yupeeee_pytools.tools import makedir, angle_of_three_points, save_dictionary_in_csv
+from yupeeee_pytools.travel import fgsm_direction
+
+
+weights_dir = None      # directory containing weights of not-in-pytorch models
 
 
 def run():

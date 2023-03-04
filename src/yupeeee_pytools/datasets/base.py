@@ -30,7 +30,7 @@ class ClassificationDataset:
     ) -> Tuple[Any, Any]:
         if isinstance(self.data, list):     # ImageNet
             path, target = self.data[index]
-            data = Image.open(path).convert('RGB')
+            data = Image.open(path).convert("RGB")
         else:
             data = self.data[index]
             target = self.targets[index]

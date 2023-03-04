@@ -1,19 +1,19 @@
 """
-python train_imagenet.py -model swin_t -config ./train_config.yaml -seed 0 -cuda -replace LayerNorm-BatchNorm2d,GELU-ReLU
+python train_imagenet.py -model swin_t -config ./train_config.yaml -seed 0 -cuda
+-replace LayerNorm-BatchNorm2d,GELU-ReLU
 """
 from argparse import ArgumentParser
 
-from pytools.datasets import ImageNetDataset
-from pytools.models import ImageNetClassificationModel, Replacer, default_imagenet_preprocess, \
-    default_weight_specification, weights_dir
-from pytools.tools import set_random_seed
-from pytools.train import SupervisedLearner
+from yupeeee_pytools.datasets import ImageNetDataset
+from yupeeee_pytools.models import ImageNetClassificationModel, Replacer, default_imagenet_preprocess, \
+    default_weight_specification
+from yupeeee_pytools.tools import set_random_seed
+from yupeeee_pytools.train import SupervisedLearner
 
 
-# Initialize the following
 dataset_root = "D:/dataset/ImageNet"
-weights_save_root = "weights_save_root"
-log_save_root = "log_save_root"
+weights_save_root = "./weights"
+log_save_root = "./logs"
 weights_save_period = 10
 
 
@@ -38,7 +38,7 @@ def run():
         name=model_name,
         pretrained=False,
         specify_weights=default_weight_specification,
-        weights_dir=weights_dir,
+        weights_dir=None,
         mode=None,
         use_cuda=use_cuda,
     )

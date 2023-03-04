@@ -34,7 +34,7 @@ def load_pytorch_model_weights(
 def load_not_in_pytorch_model(
         model_name: str,
         pretrained: bool = False,
-        weights_dir: str = weights_dir,
+        weights_dir: str = None,
 ) -> Any:
     assert model_name in list_of_not_in_pytorch_imagenet_models
 

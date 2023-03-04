@@ -9,7 +9,7 @@ datasets = [
 
 
 # normalize & denormalize
-standard = 'train'
+standard = "train"
 
 means = {
     "CIFAR-10_train": [125.3069, 122.9501, 113.8660],

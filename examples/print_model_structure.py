@@ -1,11 +1,12 @@
 from argparse import ArgumentParser
 import torch
 
-from pytools.models import ImageNetClassificationModel, default_weight_specification, weights_dir
-from pytools.tools import save_list_in_txt
+from yupeeee_pytools.models import ImageNetClassificationModel, default_weight_specification
+from yupeeee_pytools.tools import save_list_in_txt
 
 
-save_path = "./pytools/models/classification/structure"
+weights_dir = None      # directory containing weights of not-in-pytorch models
+save_path = "./"
 
 
 def run():

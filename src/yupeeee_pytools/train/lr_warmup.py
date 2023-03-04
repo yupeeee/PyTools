@@ -1,7 +1,6 @@
 import math
 from torch.optim.lr_scheduler import _LRScheduler
 
-
 __all__ = [
     "warmup_wrapper",
 ]
@@ -28,6 +27,7 @@ def warmup_wrapper(scheduler, config, start_epoch):
     """
     return WarmUpLR(
         scheduler=scheduler,
+        max_lr=config.LR,
         init_lr=config.SCHEDULER.WARMUP.INIT_LR,
         warmup_steps=config.SCHEDULER.WARMUP.WARMUP_STEPS,
         strategy=config.SCHEDULER.WARMUP.STRATEGY,
@@ -53,6 +53,7 @@ class WarmUpLR(_LRScheduler):
     def __init__(
             self,
             scheduler: _LRScheduler,
+            max_lr: float,
             init_lr: float = 0.,
             warmup_steps: int = 1,
             strategy: str = "linear",
@@ -61,6 +62,7 @@ class WarmUpLR(_LRScheduler):
         assert strategy in strategies
 
         self.scheduler = scheduler
+        self.max_lr = max_lr
         self.init_lr = init_lr
         self.warmup_steps = warmup_steps
         self.strategy = strategy
@@ -99,14 +101,17 @@ class WarmUpLR(_LRScheduler):
 
     def init_param(self):
         for group in self.scheduler.optimizer.param_groups:
-            group["warmup_max_lr"] = group["lr"]
+            if self.start_epoch == 1:
+                group["warmup_max_lr"] = group["lr"]
+            else:
+                group["warmup_max_lr"] = self.max_lr
 
             init_lr = min(self.init_lr, group["lr"])
 
             group["lr"] = init_lr
             group["warmup_init_lr"] = init_lr
 
-        for i in range(self.start_epoch - 1):
+        for i in range(1, self.start_epoch):
             self.scheduler.optimizer.step()
             self.step()
 
@@ -133,7 +138,7 @@ class WarmUpLR(_LRScheduler):
             lrs = self.get_lr()
 
             for param_group, lr in zip(
-                self.scheduler.optimizer.param_groups, lrs
+                    self.scheduler.optimizer.param_groups, lrs
             ):
                 param_group["lr"] = lr
 

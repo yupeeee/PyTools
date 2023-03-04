@@ -1,13 +1,14 @@
 import tqdm
 
-from pytools.datasets import ImageNetDataset
-from pytools.models import \
-    ImageNetClassificationModel, Preprocess, default_weight_specification, weights_dir, imagenet_model_names
+from yupeeee_pytools.datasets import ImageNetDataset
+from yupeeee_pytools.models import \
+    ImageNetClassificationModel, Preprocess, default_weight_specification, imagenet_model_names
 
 
 ImageNet_dir = "D:/dataset/ImageNet"
 model_name = "resnet50"
 weight_specification = default_weight_specification
+weights_dir = None      # directory containing weights of not-in-pytorch models
 use_cuda = True
 machine = "cuda" if use_cuda else "cpu"
 
@@ -34,7 +35,7 @@ model = ImageNetClassificationModel(
 classes = list(set([int(v) for v in dataset.targets]))
 classes.sort()
 
-acc = 0
+acc = 0.
 
 for c in tqdm.tqdm(
         classes,

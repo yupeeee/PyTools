@@ -1,11 +1,12 @@
 import torch
 
-from pytools.models import ImageNetClassificationModel, default_weight_specification, weights_dir, Replacer
+from yupeeee_pytools.models import ImageNetClassificationModel, default_weight_specification, Replacer
 
 
 model_name = "resnet50"
 target = "BatchNorm2d"
 to = "LayerNorm"
+weights_dir = None      # directory containing weights of not-in-pytorch models
 use_cuda = True
 machine = "cuda" if use_cuda else "cpu"
 

@@ -1,19 +1,19 @@
 """
-python train_cifar10.py -model swin_t -config ./train_config.yaml -seed 0 -cuda -replace LayerNorm-BatchNorm2d,GELU-ReLU
+python train_cifar10.py -model swin_t -config ./train_config.yaml -seed 0 -cuda
+-replace LayerNorm-BatchNorm2d,GELU-ReLU
 """
 from argparse import ArgumentParser
 
-from pytools.datasets import CIFAR10Dataset
-from pytools.models import CIFAR10ClassificationModel, Replacer, \
+from yupeeee_pytools.datasets import CIFAR10Dataset
+from yupeeee_pytools.models import CIFAR10ClassificationModel, Replacer, \
     default_cifar10_train_preprocess, default_cifar10_val_preprocess
-from pytools.tools import set_random_seed
-from pytools.train import SupervisedLearner
+from yupeeee_pytools.tools import set_random_seed
+from yupeeee_pytools.train import SupervisedLearner
 
 
-# Initialize the following
 dataset_root = "D:/dataset/CIFAR-10"
-weights_save_root = "weights_save_root"
-log_save_root = "log_save_root"
+weights_save_root = "./weights"
+log_save_root = "./logs"
 weights_save_period = 10
 
 

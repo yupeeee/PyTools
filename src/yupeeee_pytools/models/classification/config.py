@@ -9,8 +9,6 @@ modes = [None, "train", "eval"]
 weight_specifications = [None, "DEFAULT", "IMAGENET1K_V1", "IMAGENET1K_V2"]
 default_weight_specification = "IMAGENET1K_V1"
 
-weights_dir = "./pytools/models/classification/weights"
-
 default_cifar10_train_preprocess = tf.Compose([
     # tf.ToPILImage(),
     # tf.RandomCrop(32, padding=4),

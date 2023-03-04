@@ -1,8 +1,8 @@
 import numpy as np
 
-from pytools.datasets import ImageNetDataset, normalize, denormalize
-from pytools.models import ImageNetClassificationModel, Preprocess, default_weight_specification, weights_dir
-from pytools.tools import plot_multiple_images
+from yupeeee_pytools.datasets import ImageNetDataset, normalize, denormalize
+from yupeeee_pytools.models import ImageNetClassificationModel, Preprocess, default_weight_specification
+from yupeeee_pytools.tools import plot_multiple_images
 
 
 ImageNet_dir = "D:/dataset/ImageNet"
@@ -12,6 +12,7 @@ layer_ith = None
 alpha = 0.5
 class_index = 208
 weight_specification = default_weight_specification
+weights_dir = None      # directory containing weights of not-in-pytorch models
 use_cuda = True
 machine = "cuda" if use_cuda else "cpu"
 
@@ -56,4 +57,7 @@ cam = model.grad_cam(
 plot_multiple_images(
     images=denormalizer(data).permute(0, 2, 3, 1) * (1 - alpha) + cam * alpha,
     desired_hw_ratio=(1, 1),
+    dpi=300,
+    pad_inches=0.05,
+    save_to=None,
 )

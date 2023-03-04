@@ -1,6 +1,6 @@
 import torchvision.transforms as tf
 
-from pytools import datasets
+from yupeeee_pytools import datasets
 
 
 root = "D:/dataset"
@@ -12,7 +12,7 @@ for dataset_name in datasets.datasets:
 
         dataset = datasets.ImageNetDataset(
             root=f"{root}/{dataset_name}",
-            split="val",
+            split="train",
             transform=tf.Compose([
                 tf.Resize(256),
                 tf.CenterCrop(224),
