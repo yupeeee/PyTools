@@ -7,9 +7,9 @@ PyTools is a Python package based on PyTorch.
 
 ## Installation
 
-Latest version: 0.1.3
+Latest version: 0.1.4
 ```
-pip install yupeeee-pytools==0.1.3
+pip install yupeeee-pytools==0.1.4
 ```
 
 Manual installation of PyTorch is required.\
