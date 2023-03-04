@@ -12,8 +12,7 @@ __all__ = [
 def makedir(
         path: str,
 ) -> None:
-    if path != "":
-        os.makedirs(path, exist_ok=True)
+    os.makedirs(path, exist_ok=True)
 
 
 def get_file_list(
