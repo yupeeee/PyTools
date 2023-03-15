@@ -50,6 +50,9 @@ class IFGSM:
         ):
             _data = self.fgsm(_data, targets, self.alpha)
 
+            if self.clip_per_iter:
+                _data = _data.clamp(0, 1)
+
         return _data
 
     def get_data_grad(
@@ -95,9 +98,6 @@ class IFGSM:
         perturbations = perturbations.clamp(-epsilon, epsilon)
 
         _data = data + perturbations
-
-        if self.clip_per_iter:
-            _data = _data.clamp(0, 1)
 
         return _data
 

@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 
+from .config import methods, normalizations
+
 
 __all__ = [
-    "normalize_direction",
-    "fgsm_direction",
-    "random_direction",
+    "DirectionGenerator",
 ]
 
 
@@ -13,8 +13,6 @@ def normalize_direction(
         direction: torch.Tensor,
         method: str = "dim",
 ) -> torch.Tensor:
-    assert method in ["dim", "unit"]
-
     shape = direction.shape
 
     normalized = direction.reshape(-1)
@@ -83,3 +81,49 @@ def random_direction(
         direction = normalize_direction(direction, normalize)
 
     return direction
+
+
+class DirectionGenerator:
+    def __init__(
+            self,
+            method: str = "fgsm",
+            normalize: str = "dim",
+            seed: int = None,
+            model=None,
+            use_cuda: bool = False,
+    ) -> None:
+        assert method in methods
+        assert normalize in normalizations
+
+        self.method = method,
+        self.normalize = normalize
+        self.seed = seed
+        self.model = model
+        self.use_cuda = use_cuda
+
+    def __call__(
+            self,
+            data: torch.Tensor,
+            targets: torch.Tensor = None,
+    ) -> torch.Tensor:
+        if self.method == "fgsm":
+            assert self.model is not None
+
+            return fgsm_direction(
+                data=data,
+                targets=targets,
+                model=self.model,
+                normalize=self.normalize,
+                seed=self.seed,
+                use_cuda=self.use_cuda,
+            )
+
+        elif self.method == "random":
+            return random_direction(
+                data=data,
+                normalize=self.normalize,
+                seed=self.seed,
+            )
+
+        else:
+            raise ValueError
