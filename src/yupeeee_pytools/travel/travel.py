@@ -159,6 +159,8 @@ class Traveler:
             direction: torch.Tensor,
             i: int,
     ) -> Tuple[torch.Tensor, float]:
+        data = data.unsqueeze(dim=0)
+
         self.correct = self.is_correct(data, target)
 
         if not self.correct:

@@ -95,7 +95,7 @@ class DirectionGenerator:
         assert method in methods
         assert normalize in normalizations
 
-        self.method = method,
+        self.method = method
         self.normalize = normalize
         self.seed = seed
         self.model = model

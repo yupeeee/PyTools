@@ -142,6 +142,15 @@ class ClassificationModel:
     ) -> None:
         self.model.load_state_dict(torch.load(state_dict_path))
 
+    def add_normalizer_in_front(
+            self,
+            normalizer: torch.nn.Module,
+    ) -> None:
+        self.model = nn.Sequential(
+            normalizer,
+            self.model,
+        )
+
     def predict(
             self,
             data: Any,
